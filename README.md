@@ -2,11 +2,11 @@
 
 此為《[系统设计面试：内幕指南](https://learning-guide.gitbook.io/system-design-interview)》筆記整理
 
-原名：*System Design Interview: An Insider's Guide*  
-作者：Alex Xu  
+原名：*System Design Interview: An Insider's Guide*
+作者：Alex Xu
 中文譯本：[learning-guide.gitbook.io/system-design-interview](https://learning-guide.gitbook.io/system-design-interview)
 
-> 本 repo 為個人學習心得，非官方譯本。英文原版：[天龍書局](https://www.tenlong.com.tw/products/9798664653403) 
+> 本 repo 為個人學習心得，非官方譯本。英文原版：[天龍書局](https://www.tenlong.com.tw/products/9798664653403)
 
 ---
 
@@ -15,8 +15,8 @@
 | 章節 | 筆記 |
 |------|------|
 | 第 1 章：從零到數百萬用戶 | [CH1](./CH1/index.md) |
-| 第 2 章：粗略估算 | — |
-| 第 3 章：系統設計面試框架 | — |
+| 第 2 章：粗略估算 | [CH2](./CH2/index.md) |
+| 第 3 章：系統設計面試框架 | [CH3](./CH3/index.md) |
 | 第 4 章：設計一個分散式限流器 | — |
 | 第 5 章：一致性哈希設計 | — |
 | 第 6 章：設計一個 key-value 儲存系統 | — |
@@ -32,7 +32,7 @@
 
 ## 第二卷
 
-原名：*System Design Interview: An Insider's Guide Volume 2*  
+原名：*System Design Interview: An Insider's Guide Volume 2*
 作者：Alex Xu & Sahn Lam
 
 | 章節 | 筆記 |
