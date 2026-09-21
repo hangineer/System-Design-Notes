@@ -1,13 +1,7 @@
 # [分散式系統中設計唯一ID 生成器](https://learning-guide.gitbook.io/system-design-interview/xi-tong-she-ji-mian-shi-nei-mu-zhi-nan-di-yi-juan/chapter-07-design-a-unique-id-generator-in-distributed-systems)
 
 ### 學習重點
-- 了解 key-value 儲存設計
-- 設計一個支援以下操作的鍵值儲存：
-```
-put(key, value)// 插入與 key 關聯的 value
-get(key)// 取得與 key 關聯的 value
-```
-
+- 了解分散式系統的 ID 生成器
 
 ### 前情提要
 在傳統資料庫中使用具有 auto_increment 屬性的主鍵，但是 auto_increment 在分散式環境中起不了作用
