@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450" font-family="'PingFang TC','Noto Sans TC','Microsoft JhengHei',system-ui,sans-serif" font-size="15">
+<title>短網址建立流程（動態）</title>
+<style>@keyframes l0{0%,4.29%{opacity:0}6.43%,94.29%{opacity:1}94.64%,100%{opacity:0}}@keyframes h0{0%,10.36%{opacity:0}10.71%,94.29%{opacity:1}94.64%,100%{opacity:0}}@keyframes c0{0%,4.29%{stroke-dashoffset:0}10.71%,94.29%{stroke-dashoffset:-1}94.64%,100%{stroke-dashoffset:0}}.l0{animation:l0 14.0s linear infinite}.h0{animation:h0 14.0s linear infinite}.c0{animation:c0 14.0s linear infinite}.d0{animation:d0 14.0s linear infinite}@keyframes d0{0%,4.29%{opacity:0;transform:translate(100px,120px)}4.43%{opacity:1;transform:translate(100px,120px)}10.71%{opacity:1;transform:translate(410px,120px)}11.79%,100%{opacity:0;transform:translate(410px,120px)}}@keyframes l1{0%,17.14%{opacity:0}19.29%,94.29%{opacity:1}94.64%,100%{opacity:0}}@keyframes h1{0%,23.21%{opacity:0}23.57%,94.29%{opacity:1}94.64%,100%{opacity:0}}@keyframes c1{0%,17.14%{stroke-dashoffset:0}23.57%,94.29%{stroke-dashoffset:-1}94.64%,100%{stroke-dashoffset:0}}.l1{animation:l1 14.0s linear infinite}.h1{animation:h1 14.0s linear infinite}.c1{animation:c1 14.0s linear infinite}.d1{animation:d1 14.0s linear infinite}@keyframes d1{0%,17.14%{opacity:0;transform:translate(410px,165px)}17.29%{opacity:1;transform:translate(410px,165px)}19.68%{opacity:1;transform:translate(466px,165px)}21.04%{opacity:1;transform:translate(466px,195px)}23.57%{opacity:1;transform:translate(410px,195px)}24.64%,100%{opacity:0;transform:translate(410px,195px)}}@keyframes l2{0%,30.00%{opacity:0}32.14%,94.29%{opacity:1}94.64%,100%{opacity:0}}@keyframes h2{0%,36.07%{opacity:0}36.43%,94.29%{opacity:1}94.64%,100%{opacity:0}}@keyframes c2{0%,30.00%{stroke-dashoffset:0}36.43%,94.29%{stroke-dashoffset:-1}94.64%,100%{stroke-dashoffset:0}}.l2{animation:l2 14.0s linear infinite}.h2{animation:h2 14.0s linear infinite}.c2{animation:c2 14.0s linear infinite}.d2{animation:d2 14.0s linear infinite}@keyframes d2{0%,30.00%{opacity:0;transform:translate(410px,230px)}30.14%{opacity:1;transform:translate(410px,230px)}32.54%{opacity:1;transform:translate(466px,230px)}33.89%{opacity:1;transform:translate(466px,260px)}36.43%{opacity:1;transform:translate(410px,260px)}37.50%,100%{opacity:0;transform:translate(410px,260px)}}@keyframes l3{0%,42.86%{opacity:0}45.00%,94.29%{opacity:1}94.64%,100%{opacity:0}}@keyframes h3{0%,48.93%{opacity:0}49.29%,94.29%{opacity:1}94.64%,100%{opacity:0}}@keyframes c3{0%,42.86%{stroke-dashoffset:0}49.29%,94.29%{stroke-dashoffset:-1}94.64%,100%{stroke-dashoffset:0}}.l3{animation:l3 14.0s linear infinite}.h3{animation:h3 14.0s linear infinite}.c3{animation:c3 14.0s linear infinite}.d3{animation:d3 14.0s linear infinite}@keyframes d3{0%,42.86%{opacity:0;transform:translate(410px,305px)}43.00%{opacity:1;transform:translate(410px,305px)}49.29%{opacity:1;transform:translate(690px,305px)}50.36%,100%{opacity:0;transform:translate(690px,305px)}}@keyframes l4{0%,55.71%{opacity:0}57.86%,94.29%{opacity:1}94.64%,100%{opacity:0}}@keyframes h4{0%,61.79%{opacity:0}62.14%,94.29%{opacity:1}94.64%,100%{opacity:0}}@keyframes c4{0%,55.71%{stroke-dashoffset:0}62.14%,94.29%{stroke-dashoffset:-1}94.64%,100%{stroke-dashoffset:0}}.l4{animation:l4 14.0s linear infinite}.h4{animation:h4 14.0s linear infinite}.c4{animation:c4 14.0s linear infinite}.d4{animation:d4 14.0s linear infinite}@keyframes d4{0%,55.71%{opacity:0;transform:translate(690px,350px)}55.86%{opacity:1;transform:translate(690px,350px)}62.14%{opacity:1;transform:translate(410px,350px)}63.21%,100%{opacity:0;transform:translate(410px,350px)}}@keyframes l5{0%,68.57%{opacity:0}70.71%,94.29%{opacity:1}94.64%,100%{opacity:0}}@keyframes h5{0%,74.64%{opacity:0}75.00%,94.29%{opacity:1}94.64%,100%{opacity:0}}@keyframes c5{0%,68.57%{stroke-dashoffset:0}75.00%,94.29%{stroke-dashoffset:-1}94.64%,100%{stroke-dashoffset:0}}.l5{animation:l5 14.0s linear infinite}.h5{animation:h5 14.0s linear infinite}.c5{animation:c5 14.0s linear infinite}.d5{animation:d5 14.0s linear infinite}@keyframes d5{0%,68.57%{opacity:0;transform:translate(410px,395px)}68.71%{opacity:1;transform:translate(410px,395px)}75.00%{opacity:1;transform:translate(100px,395px)}76.07%,100%{opacity:0;transform:translate(100px,395px)}}</style>
+<rect x="1" y="1" width="798" height="448" rx="12" fill="#f8fafc" stroke="#e2e8f0" stroke-width="2"/>
+<line x1="100" y1="66" x2="100" y2="426" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 4"/>
+<rect x="30.0" y="24" width="140" height="42" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<text x="100" y="51" text-anchor="middle" font-weight="600" fill="#0f172a">使用者</text>
+<line x1="410" y1="66" x2="410" y2="426" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 4"/>
+<rect x="340.0" y="24" width="140" height="42" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<text x="410" y="51" text-anchor="middle" font-weight="600" fill="#0f172a">短網址服務</text>
+<line x1="690" y1="66" x2="690" y2="426" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 4"/>
+<rect x="620.0" y="24" width="140" height="42" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<text x="690" y="51" text-anchor="middle" font-weight="600" fill="#0f172a">資料庫</text>
+<g>
+  <path d="M100,120 H410" fill="none" stroke="#2563eb" stroke-width="2"/>
+  <path class="c0" d="M100,120 H410" fill="none" stroke="#f8fafc" stroke-width="6" pathLength="1" stroke-dasharray="1 1"/>
+  <polygon class="h0" points="410,120 400,115 400,125" fill="#2563eb"/>
+  <text class="l0" stroke="#f8fafc" stroke-width="5" paint-order="stroke" stroke-linejoin="round" x="255.0" y="111" text-anchor="middle" fill="#0f172a">POST 原始網址</text>
+  <circle class="d0" r="6" fill="#2563eb" stroke="#fff" stroke-width="2"/>
+</g>
+<g>
+  <path d="M410,165 h56 v30 h-56" fill="none" stroke="#9333ea" stroke-width="2"/>
+  <path class="c1" d="M410,165 h56 v30 h-56" fill="none" stroke="#f8fafc" stroke-width="6" pathLength="1" stroke-dasharray="1 1"/>
+  <polygon class="h1" points="410,195 419,190 419,200" fill="#9333ea"/>
+  <text class="l1" stroke="#f8fafc" stroke-width="5" paint-order="stroke" stroke-linejoin="round" x="396" y="185.0" text-anchor="end" fill="#0f172a">驗證網址格式、長度、權限與建立次數</text>
+  <circle class="d1" r="6" fill="#9333ea" stroke="#fff" stroke-width="2"/>
+</g>
+<g>
+  <path d="M410,230 h56 v30 h-56" fill="none" stroke="#9333ea" stroke-width="2"/>
+  <path class="c2" d="M410,230 h56 v30 h-56" fill="none" stroke="#f8fafc" stroke-width="6" pathLength="1" stroke-dasharray="1 1"/>
+  <polygon class="h2" points="410,260 419,255 419,265" fill="#9333ea"/>
+  <text class="l2" stroke="#f8fafc" stroke-width="5" paint-order="stroke" stroke-linejoin="round" x="396" y="250.0" text-anchor="end" fill="#0f172a">產生尚未使用的短碼</text>
+  <circle class="d2" r="6" fill="#9333ea" stroke="#fff" stroke-width="2"/>
+</g>
+<g>
+  <path d="M410,305 H690" fill="none" stroke="#2563eb" stroke-width="2"/>
+  <path class="c3" d="M410,305 H690" fill="none" stroke="#f8fafc" stroke-width="6" pathLength="1" stroke-dasharray="1 1"/>
+  <polygon class="h3" points="690,305 680,300 680,310" fill="#2563eb"/>
+  <text class="l3" stroke="#f8fafc" stroke-width="5" paint-order="stroke" stroke-linejoin="round" x="550.0" y="296" text-anchor="middle" fill="#0f172a">寫入 短碼 → 原始網址</text>
+  <circle class="d3" r="6" fill="#2563eb" stroke="#fff" stroke-width="2"/>
+</g>
+<g>
+  <path d="M690,350 H410" fill="none" stroke="#16a34a" stroke-width="2" stroke-dasharray="6 5"/>
+  <path class="c4" d="M690,350 H410" fill="none" stroke="#f8fafc" stroke-width="6" pathLength="1" stroke-dasharray="1 1"/>
+  <polygon class="h4" points="410,350 420,345 420,355" fill="#16a34a"/>
+  <text class="l4" stroke="#f8fafc" stroke-width="5" paint-order="stroke" stroke-linejoin="round" x="550.0" y="341" text-anchor="middle" fill="#0f172a">寫入成功</text>
+  <circle class="d4" r="6" fill="#16a34a" stroke="#fff" stroke-width="2"/>
+</g>
+<g>
+  <path d="M410,395 H100" fill="none" stroke="#16a34a" stroke-width="2" stroke-dasharray="6 5"/>
+  <path class="c5" d="M410,395 H100" fill="none" stroke="#f8fafc" stroke-width="6" pathLength="1" stroke-dasharray="1 1"/>
+  <polygon class="h5" points="100,395 110,390 110,400" fill="#16a34a"/>
+  <text class="l5" stroke="#f8fafc" stroke-width="5" paint-order="stroke" stroke-linejoin="round" x="255.0" y="386" text-anchor="middle" fill="#0f172a">回傳短網址 short.com/aB93xK</text>
+  <circle class="d5" r="6" fill="#16a34a" stroke="#fff" stroke-width="2"/>
+</g>
+</svg>

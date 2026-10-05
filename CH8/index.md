@@ -18,25 +18,14 @@
 5. 把短碼與原始網址存入 DB
 6. 回傳組合好的短網址
 
-```mermaid
-sequenceDiagram
-    actor U as 使用者
-    participant S as 短網址服務
-    participant DB as 資料庫
-    U->>S: POST 原始網址
-    S->>S: 驗證網址格式、長度、權限與建立次數
-    S->>S: 產生尚未使用的短碼
-    S->>DB: 寫入 短碼 → 原始網址
-    DB-->>S: 寫入成功
-    S-->>U: 回傳短網址 short.com/aB93xK
-```
+![短網址建立流程](../assets/CH8/create-flow.svg)
 
 ### 1.2 使用者點擊短網址時，實際發生什麼事？
 
 > 以 https://short.com/aB93xK 為例
 
 1. 瀏覽器會先解析網域的 IP、建立連線與 TLS，接著送出 HTTP 請求
-2. 短網址服務收到請求後，從路徑取出 `aB93xK`，並坐 SQL 查詢
+2. 短網址服務收到請求後，從路徑取出 `aB93xK`，並做 SQL 查詢
 3. 確認連結存在、沒有過期、沒有停用後，回應：
 
 ```
@@ -55,19 +44,7 @@ Cache-Control: no-store
 | 第一次 | 短網址服務 | 查詢目的地，取得跳轉回應(redirect) |
 | 第二次 | 原始網站   | 取得真正的網頁內容                 |
 
-```mermaid
-sequenceDiagram
-    actor B as 瀏覽器
-    participant S as 短網址服務 short.com
-    participant DB as 資料庫
-    participant O as 原始網站 example.com
-    B->>S: 第一次請求 GET /aB93xK
-    S->>DB: 查詢 aB93xK
-    DB-->>S: 原始網址、狀態、到期時間
-    S-->>B: 302 Found + Location
-    B->>O: 第二次請求 GET /articles/system-design
-    O-->>B: 200 OK 網頁內容
-```
+![點擊短網址的跳轉流程](../assets/CH8/redirect-flow.svg)
 
 ### 1.3 常見的 3xx 狀態碼
 
@@ -80,41 +57,25 @@ HTTP 3xx 狀態碼：重新導向（Redirection）
 | `307`  | 暫時跳轉，保留 HTTP Method 與請求內容      | 適合需要保留 POST 等方法的情境                       |
 | `308`  | 永久跳轉，保留 HTTP Method 與請求內容      | 永久移轉且需要保留請求方法的情境                     |
 
-同一個短網址被點擊第二次時，301 與 302 的差別：
-
-```mermaid
-sequenceDiagram
-    actor B as 瀏覽器
-    participant S as 短網址服務
-    participant O as 原始網站
-    Note over B,O: 301：瀏覽器已快取跳轉結果，不再經過短網址服務
-    B->>B: 讀取快取的跳轉結果
-    B->>O: 直接前往原始網站
-    Note over B,O: 302 + no-store：每次點擊都會回到短網址服務
-    B->>S: GET /aB93xK
-    S-->>B: 302 Found + Location
-    B->>O: 前往原始網站
-```
-
-用 301 時，之後的點擊不會抵達短網址服務，因此無法統計點擊，也無法停用或更改目的地。
-
 ### 1.4 短網址怎麼產生？
 
 常見有三種方法：
 
 1. 轉成 Base62
-  Base62 只會有英數字，處理方便。此外，Base62 是編碼，不是加密，知道編碼規則的人，可以把短網址轉回數字，甚至推測服務規模。base62 不會發生碰撞，因為不同的英數字一定得到不同的字串。
+
+  > Base62 只會有英數字，處理方便。此外，Base62 是編碼，不是加密，知道編碼規則的人，可以把短網址轉回數字，甚至推測服務規模。base62 不會發生碰撞，因為不同的英數字一定得到不同的字串。
 
 PS. Base64 編碼可能有 `/`，容易與路徑分隔混淆，需額外處理。
 
 2. 產生隨機短碼
-從 62 個字元（0-9、a-z、A-Z）隨機挑。
+
+  > 從 62 個字元（0-9、a-z、A-Z）隨機挑。
 
 3. 對原始網址進行雜湊，再截取部分字元
 
-雜湊函式可以把任意長度的輸入，變成固定長度的輸出。輸出看起來像亂碼，但同樣的輸入一定得到同樣的輸出，因為只截取部分字元，所以是可能發生碰撞的(hash collision)。
+  > 雜湊函式可以把任意長度的輸入，變成固定長度的輸出。同樣的輸入一定得到同樣的輸出，因為只截取部分字元，所以是有可能發生碰撞的(hash collision)。
 
-發生碰撞時的處理：在網址後面加一段預定的字串，重新雜湊，直到不衝突為止。
+⚠️ 發生碰撞時的處理：在網址後面加一段預定的字串，重新雜湊，直到不衝突為止。
 
 ```mermaid
 flowchart TD
@@ -131,8 +92,6 @@ PS. 「比對原始網址是否相同」是補充的步驟，書上的流程只�
 
 
 ## 2. 定義需求
-
-> 先從定義問題和 scope 開始
 
 > Q1. 確認流量是多少
 >
@@ -199,7 +158,7 @@ Response body：
 }
 ```
 
-* GET `/:code` 查詢短網址、檢查有效性
+GET `/:code` 查詢短網址、檢查有效性
 
 > HTTP/2 302 Found
 >
