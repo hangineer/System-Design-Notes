@@ -252,6 +252,10 @@ const html = await page.content();                   // 渲染後的 HTML
 * 規模小：Hash Set 存已見過的 URL。
 * 規模大：Bloom Filter，用很少的空間判斷「沒看過」或「可能看過」。
 
+> 為什麼不用快取？
+>
+> 快取只放一部分網址，miss 時還是得查資料庫才知道是不是新網址。爬蟲遇到的網址大部分本來就是新的，幾乎每次都會 miss，快取等於白放。快取和 Bloom Filter 的完整比較可看第 8 章：Bloom Filter。
+
 </details>
 
 <details>
