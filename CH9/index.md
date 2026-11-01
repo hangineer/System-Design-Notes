@@ -5,7 +5,7 @@
 > 網路爬蟲（Web Crawler or Web Spider），是一種自動化程式或機器人，用來在網路上自動瀏覽網頁並收集資料，爬取內容可以是網頁、圖片、PDF、影片、JSON 等。許多網站會在根目錄設置 `robots.txt` 檔案，用來規範哪些頁面允許爬蟲訪問、哪些不行。
 
 ### 1.1 應用層面
-* 搜尋引擎索引：Googlebot(Google 搜尋引擎背後的網路爬蟲)，最常見
+* 搜尋引擎索引：Googlebot(Google 搜尋引擎背後的網路爬蟲) 最常見
 * 網路監控：監控侵權行為
 * 資料挖掘：在網路中爬取有用的知識，例如：租屋資訊、股東大會報告等
 * 資料存取：有些國家圖書管會用爬蟲來存取網站，保存不同時間的版本，當成歷史文獻，供現在與未來的研究者使用
@@ -18,7 +18,7 @@
 | 元件 | 中文意思 | 負責做什麼 |
 |---|---|---|
 | **Seed URLs** | 起始網址，爬蟲的起點 | 提供起始點，例如新聞網站首頁，一般是將整個 URL 拆成更小單位，像是基於位置、主題(購物、體育等) |
-| **URL Frontier** | 待爬網址與排程 | 儲存待下載的 URL，以及先抓哪個，可稱為 FIFO 佇列 |
+| **URL Frontier** | 待爬網址與排程 | 儲存待下載的 URL、哪些 URL 優先抓取，可稱為 FIFO 佇列 |
 | **HTML Downloader** | HTML 下載器 | 發出 HTTP 請求，下載網頁，URL 是由URL Frontier 提供的 |
 | **DNS Resolver** | DNS 解析器 | 將網域名稱轉成 IP，讓下載器找到伺服器 |
 | **Content Parser** | 內容解析器 | 解析下載回來的 HTML，供後續處理 |
@@ -26,7 +26,7 @@
 | **Content Storage** | 內容儲存區 | 保存抓到的網頁內容，大部分內容儲存在磁碟上，因資料集太大而無法放入記憶體; 熱門內容則保存在記憶體中以減少延遲 |
 | **URL Extractor** | 網址擷取器 | 從 HTML 頁面解析並擷取網址 |
 | **URL Filter** | 網址過濾器 | 排除某些內容類型、檔案副檔名、錯誤連結和「黑名單」網站中的 URL |
-| **URL Seen?** | 網址是否已發現？（去重） | 避免同一個網址重複加入待爬清單 |
+| **URL Seen?** | 網址是否已出現（去重） | 避免同一個網址重複加入待爬清單 |
 | **URL Storage** | 網址儲存區 | 記錄已發現的網址，供去重查詢 |
 
 
@@ -34,6 +34,8 @@
 * 限制並行數，除了提升速度，也避免請求過多
 * 失敗處理
 * 只需進行最少的變更即可支援新的內容類型（可擴充性）
+  * 如果每個月需要抓取數十億個頁面，單一 Crawler Worker 很難負荷，因此可以透過 Horizontal Scaling（水平擴展），讓多個 Worker 同時處理抓取任務
+  * 這些 Worker 可以透過共享的 URL Frontier 取得尚未處理的任務，將工作分散到不同節點，以提升整體抓取吞吐量。
 * 遵守爬取規範，像是 `robots.txt`、網站規範、請求頻率限制
 
 ## 2. 定義需求
@@ -65,8 +67,6 @@
 
 ## 3. 粗估系統量級
 
-> 目的：算出大概的流量與資料量，數量級對就好，並用結果推導設計決策
-
 | 項目 | 假設 / 算式 | 結果 |
 | ---- | ----------- | ---- |
 | 讀取 QPS | 10 億 ÷ 30 ÷ 24 ÷ 3600 | 約 400 頁/秒 |
@@ -74,7 +74,16 @@
 | 儲存空間 | 平均網頁大小為 500k → 10 億 × 500k | 500 TB/月, 五年共 30 PB |
 | 峰值 QPS | 讀取 QPS × 2～3 | 約 800 頁/秒 |
 
+光是保存抓取的頁面資料，就可能需要約 30 PB 的儲存空間，而且還沒算進索引、備份與其他額外資料。
 
+從這個簡單的估算可以發現，Crawler 的壓力不只是每秒要發送多少 Request，還需要考慮：
+
+- **儲存空間**：抓回來的網頁需要多少容量？
+- **網路頻寬**：每秒需要下載多少資料？
+- **URL 數量**：大量待抓取的 URL 要如何管理？
+- **DNS Latency**：解析網域名稱需要多少時間？
+- **Response Time**：外部網站回應太慢，會不會影響抓取速度？
+- **重試（Retry）**：抓取失敗的任務要如何重新處理？
 
 ## 4. 深入設計
 
@@ -121,15 +130,33 @@ URL Frontier 是確保 URL 優先順序、禮貌性的重要元件。
 > 因為每條佇列只由「一個」worker 依序處理，所以同一個網站在同一時間最多只有一個請求，不會同時被好幾個 worker 打；worker 也能在兩次下載之間加上延遲，控制請求速率。
 > 如果多個網站混在同一條佇列，或同一個網站分散在多條佇列，就沒辦法保證「同一時間只打它一次」。
 
+> 另一種做法：共享的 Host Rate Limit
+>
+> 如果每個 worker 各自限流，加起來還是可能對同一個 host 送出太多請求，所以限流狀態必須共用。另一種做法是任何 worker 都能抓任何 host，但發請求前要先向共享的限速器（例如 Redis 上的 token bucket）取得許可，每個 host 也可以各自設定並發數與請求間隔。
+>
+> | | Per-host Queue | 共享 Host Rate Limit |
+> |---|---|---|
+> | 共用狀態 | 不需要，一個 host 只歸一個 worker | 需要，所有 worker 查同一個限速器 |
+> | 優點 | 簡單，不用額外元件 | 分配彈性，worker 不會因為 host 太少而閒置 |
+> | 缺點 | host 少或分布不均時，部分 worker 會閒置 | 每個請求多一次查詢，限速器本身也要能擴展 |
+
 * 新鮮度
-網頁是會不斷更新的，爬蟲需要定期重新抓取下頁面的內容保持資料是最新的狀態，但重新抓取所有 URL 好耗時又耗費資源，有以下幾種優化新鮮度的方法：
+網頁會不斷更新，爬蟲需要定期重新抓取下頁面的內容保持資料是最新的狀態，但重新抓取所有 URL 好耗時又耗費資源，有以下幾種優化新鮮度的方法：
 
 1. 根據網頁更新歷史重新抓取
 2. 對 URL 進行優先排序，針對優先度高的頻繁抓取。
 
+### Re-crawl Scheduler
+抓過的 URL 會被 URL Seen 擋下，不會再進 Frontier，所以「定期重新抓取」需要一個專門的元件負責：
 
-* URL Frontier 存儲
-URL 的數量可能是非常龐大的，存在記憶體中不實際也不好擴展，也不該都放在磁碟，因為磁碟的讀取速度很慢。這裡採用「混合做法」，大多數 URL 放在磁碟上，在記憶體中維護緩衝區以進行入隊、出隊操作。緩衝區的資料會定期寫入磁碟。
+* 記錄每個 URL 的上次抓取時間、下次該抓的時間、過去的變動 log
+* 定期掃描到期的 URL，直接送回 Prioritizer（繞過 URL Seen?）
+* 自適應間隔：重抓後比對內容 hash（Content Seen?），有變就縮短間隔，沒變就拉長，這就是「根據網頁更新歷史重新抓取」的具體做法
+* 節省頻寬：重抓時發 conditional GET（`If-Modified-Since`、`ETag`），網站回 `304 Not Modified` 就不用下載整頁
+
+
+### URL Frontier 存儲
+URL 的數量可能非常龐大，存在記憶體中不實際也不好擴展，也不該都放在磁碟，因為磁碟的讀取速度很慢。這裡採用「混合做法」，大多數 URL 放在磁碟上，在記憶體中維護緩衝區以進行入隊、出隊操作。緩衝區的資料會定期寫入磁碟。
 
 </details>
 
@@ -150,6 +177,12 @@ Disallow: /gp/aw/cr/
 ```
 
 來源：https://www.amazon.com/robots.txt
+
+補充：Robots.txt 與 host rate limiter
+URL Frontier 的「一個 host 一條後端佇列、兩次下載之間加延遲」就是一種 per-host 限速。
+
+* `Crawl-delay`：robots.txt 的非標準指令，例如 `Crawl-delay: 10` 表示希望爬蟲每 10 秒最多抓一次。Bing、Yandex 會遵守，Google 則忽略。
+* 自適應限速：網站回 `429 Too Many Requests`、`503`，或回應時間變慢時，自動拉長延遲；有 `Retry-After` header 就照它的時間等待。
 
 * 效能優化
 1. 分散抓取
@@ -188,6 +221,7 @@ Disallow: /gp/aw/cr/
 > 為什麼同一個 host 只交給一個地區？
 >
 > 如果同一個 host 同時分給多個地區，每個地區都會有一條該 host 的後端佇列，網站就會同時收到多個地區的請求，限速得跨地區協調。只交給一個地區的話，「一個 host 一條佇列」的禮貌性機制在地區內部就能完成。
+
 * 在 URL Frontier 做路由
 ```mermaid
 flowchart LR
@@ -200,7 +234,7 @@ flowchart LR
     E --> E1[維吉尼亞 workers]
 ```
 
-1. 短暫超時
+4. 短暫超時
 有些網站伺服器回傳慢，為了避免漫長的等待時間，指定一個「最大等待時間」。如果一個主機在預定的時間內沒有反應，爬蟲將停止運作並抓取其他網頁。
 
 </details>
@@ -212,7 +246,7 @@ flowchart LR
 
 **做法：Headless Browser**
 
-Headless Browser 就是沒有畫面的 Chrome，常用的工具有 Puppeteer、Playwright。
+Headless Browser 是沒有畫面的瀏覽器，最常用的是 Headless Chrome。通常會搭配 Puppeteer、Playwright 用程式控制瀏覽器開網頁、等 JS 執行完，再取出渲染後的 HTML。
 
 1. 用無頭瀏覽器開啟 URL
 2. 等 JS 執行完、AJAX 請求都回來
@@ -245,16 +279,46 @@ const html = await page.content();                   // 渲染後的 HTML
 </details>
 
 <details>
+  <summary>URL 正規化（URL Normalization）</summary>
+
+同一個頁面可能有很多種寫法，如果不先正規化，URL Seen? 會把它們當成不同網址，造成重複抓取：
+
+```
+HTTP://Example.com:80/a/../b/#top
+http://example.com/b/
+/b/            ← 頁面裡的相對路徑
+```
+
+常見的正規化步驟（在 URL Extractor 之後、URL Filter 和 URL Seen 之前）：
+
+* 相對路徑轉成絕對路徑
+* scheme(網路協定)、host 轉小寫，去掉預設 port
+* 解析 `.`、`..`，去掉 `#fragment`
+* 移除追蹤參數（`utm_*`、session id），或把 query 參數排序
+* 參考 `<link rel="canonical">`，網站自己宣告的正式網址
+
+</details>
+
+<details>
   <summary>URL 去重（URL Seen?）</summary>
 
 避免同一個 URL 重複加入 Frontier
 
-* 規模小：Hash Set 存已見過的 URL。
-* 規模大：Bloom Filter，用很少的空間判斷「沒看過」或「可能看過」。
+* 規模小：使用
+ Hash Set，職階存已見過的 URL。
+* 規模大：使用 Bloom Filter，用很少的空間判斷「沒看過」或「可能看過」的 URL。
 
-> 為什麼不用快取？
+Bloom Filter 重要特性：
+- 判斷「不存在」：代表這筆資料「一定」沒出現過
+- 判斷「存在」：代表這筆資料「可能」出現過，但不一定真的有（此情況又稱 False Positive，有可能把一個其實沒看過的 URL，誤判成已經看過）
+
+大型 Crawler 來說，如果可以接受少量 URL 被漏掉，就能用這種方式換取更低的記憶體使用量。
+
+如果系統不能接受新 URL 因 False Positive 而被漏抓，可以把 Bloom Filter 當作第一層快速篩選，再搭配持久化的精確集合進行確認。
+
+> 為什麼只用快取不夠？
 >
-> 快取只放一部分網址，miss 時還是得查資料庫才知道是不是新網址。爬蟲遇到的網址大部分本來就是新的，幾乎每次都會 miss，快取等於白放。快取和 Bloom Filter 的完整比較可看第 8 章：Bloom Filter。
+> 快取能加速「重複出現的熱門網址」（例如導覽列、首頁連結）。遇到新網址或冷門網址會 miss，還是得查資料庫才知道是不是新的。Bloom Filter 則能直接在記憶體判斷 URL 是否有看過，新網址不用查資料庫。兩者也可以搭配：熱門網址先查快取，其餘交給 Bloom Filter。快取和 Bloom Filter 的完整比較可看第 8 章：Bloom Filter。
 
 </details>
 
@@ -279,10 +343,10 @@ const html = await page.content();                   // 渲染後的 HTML
 </details>
 
 <details>
-  <summary>檢測並避免有問題的內容</summary>
+  <summary>檢測並避免有問題或冗餘的內容</summary>
 
-1. 冗餘內容：雜湊值或校驗和有助於檢測重複[11]。
-
+1. 冗餘內容：雜湊值或校驗和有助於檢測重複。
+  * 比較常見的做法，是替內容計算 SHA-256 等雜湊值，把它當成內容指紋。兩份 HTML 的 Hash 相同時，實務上通常可以視為相同；若系統需要更嚴格的保證，也可以再比較內容長度或原始資料。
 2. 搜尋引擎蜘蛛陷阱：導致爬蟲陷入無限循環的網頁。例如，一個無限深的目錄結構：`http://www.spidertrapexample.com/foo/bar/foo/bar/foo/bar/...`。設定 URL 最大長度可以避開這類陷阱，不過目前並沒有能偵測所有蜘蛛陷阱的萬用解法。好在含有蜘蛛陷阱的網站通常不難辨認，因為在這類網站上發現的網頁數量會異常多。雖然很難開發出自動避開蜘蛛陷阱的演算法，但可以透過人工驗證來識別，再將這些網站排除在爬蟲之外，或套用自訂的 URL 過濾器。
 
 3. 垃圾數據
@@ -331,12 +395,21 @@ flowchart TD
     renderer -- 渲染後的 HTML --> parser
     parser --> cseen{Content Seen?}
     cseen <--> cstore[(Content Storage)]
-    cseen -- 新內容 --> link[Link Extractor]
+    cseen -- 新內容 --> link["URL Extractor<br/>轉絕對路徑、正規化"]
+    cseen -. 已存在 .-> drop([丟棄])
     cseen -. 擴充模組 .-> ext["PNG 下載器、網路監控…"]
     link --> filter["URL Filter<br/>黑名單、副檔名、URL 長度上限"]
     filter --> useen{URL Seen?}
     useen <--> ustore[(URL Storage)]
     useen -- 新 URL，回到 Frontier --> prio
+    useen -. 已存在 .-> drop
+    ustore -. 到期的 URL .-> recrawl["Re-crawl Scheduler<br/>依更新歷史決定重抓間隔"]
+    cseen -. 內容是否變動 .-> recrawl
+    recrawl -- 重新抓取 --> prio
 ```
 
-和 1.2 的基本流程相比，這張圖加上了深入設計的部分：Frontier 拆成「前端佇列管優先權、後端佇列管禮貌性」，Downloader 前面多了 DNS 與 Robots.txt 快取，需要 JS 的頁面會另外送進渲染佇列，Content Seen? 之後可以接擴充模組，Frontier 的狀態也會定期存檔，當機後可以從中斷處繼續爬。
+和 1.2 的基本流程相比，這張圖加上了深入設計的部分：Frontier 拆成「前端佇列管優先權、後端佇列管禮貌性」，Downloader 前面多了 DNS 與 Robots.txt 快取，需要 JS 的頁面會另外送進渲染佇列，Content Seen? 之後可以接擴充模組，URL Extractor 會先做正規化再去重，Re-crawl Scheduler 負責把到期的舊 URL 送回 Frontier 重新抓取，Frontier 的狀態也會定期存檔，當機後可以從中斷處繼續爬。
+
+## 6. 參考資料
+
+- [20261027 第 52 次分享](https://app.notion.com/p/20261027-52-406dcde4e64380c8911fc8f224b848c2)
